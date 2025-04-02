@@ -30,6 +30,10 @@ public class SessionList {
         for (Session session : this.forVenue(venue)) {
             // for each session using that venue
             if (session.getTime().equals(exam.getTime())) {
+                // schedule exam to an already existing session
+                if (session.getCohort()!= null) {
+                    throw new IllegalStateException( " that session has already been allocated ");
+                }
                 session.scheduleExam(exam, numberStudents);
                 System.out.println( exam.getSubject() + " exam added to " + venue.roomId());
                 break;

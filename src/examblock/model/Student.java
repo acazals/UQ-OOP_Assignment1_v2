@@ -180,8 +180,22 @@ public class Student {
     // having a set of subjetc sinstead of a list would make operations faster
     // eg : for studentlist count subjetcs, AARA
 
+    public Boolean isTakingSubject(Subject subject) {
+        for (Subject mysubject : this.subjects.all()) {
+            if (mysubject.equals(subject)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Subject subject : this.subjects.all()) {
+            sb.append(subject.getTitle()).append("\n");
+        }
+
         return "Student{" +
                 "lui=" + lui +
                 ", givenNames='" + givenNames + '\'' +
@@ -189,7 +203,8 @@ public class Student {
                 ", Dob=" + Dob +
                 ", house='" + house + '\'' +
                 ", aara=" + aara +
-                '}';
+                " taken subjects = " + sb.toString() + " \n \n \n \n"
+                 + '}';
     }
 }
 

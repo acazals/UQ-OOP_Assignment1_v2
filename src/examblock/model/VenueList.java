@@ -22,7 +22,12 @@ public class VenueList {
             // the given list : sessions.forVenue(venue);
             for (Session session : sessions.forVenue(venue)) {
                 // for each session taking place in that venue
-                session.allocateStudents(exams, cohort); // examlist always the same
+
+                for (Exam exam : exams.getExams()) {
+                    session.allocateStudents(exams, cohort); // examlist always the same
+                }
+
+
             }
         }
     }

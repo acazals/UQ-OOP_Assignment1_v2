@@ -18,7 +18,7 @@ public class Session {
     private int studentCount;
 
     public Session (Venue venue, int sessionNumber, LocalDate day, LocalTime start) {
-        this.venue = venue;
+        this.venue = venue; // stores if the session will be AARA friendly or not
         // check that the id works : is unique
         if (venue.getSessionIDs().contains(sessionNumber)) {
             // make the id of the session is unique for that venue
@@ -68,60 +68,11 @@ public class Session {
     public void setStudentCount(int studentCount) {
         this.studentCount = studentCount;
     }
-// to do : allocate students, getexams, countstudents, schedule exam, allocate students
 
-    // each exam is Associated with a subject
-    // each sudent has it's own list of subjects and list of exams
+    public LocalDate getDay() {
+        return this.day;
+    }
 
-//    public void allocateStudents( ExamList exams, StudentList cohort) {
-//        if (!exams.isEmpty() && !cohort.isEmpty()) {
-//            // so there are exams taking place; and there are students
-//            // hyp : exams = subset of all the exams
-//            // only the exams relevant to this particuliar session
-//            this.exams = exams; //
-//            // just check if there is enough desks first
-//            int total = 0;
-//            ArrayList<StudentList> mylist = new ArrayList<>();
-//            StudentList myStudentList = new StudentList();
-//
-//            for (int i=0; i<this.exams.size(); i++) {
-//                // for each exam
-//                // each exam is associated with asubject
-//                // we have a methode from StudentList countstudent
-//                // counts nb of student taking a given subject + AARA or not
-//
-//                total = total + cohort.countStudents(exams.get(i).getSubject(), true) + cohort.countStudents(exams.get(i).getSubject(), false);
-//                StudentList StudentTakingExam = cohort.bySubject(exams.get(i).getSubject());
-//
-//                // student list with ALL students taking an exam here regardless of the subject
-//                for (int m =0; m<StudentTakingExam.size(); m++) {
-//                    myStudentList.add(StudentTakingExam.get(m));
-//                }
-//
-//                // array list of student list
-//                mylist.add(StudentTakingExam);
-//                // now we have the total number of student in this session
-//                // we have a student list for each exam too
-//            }
-//            if (this.venue.deskCount() < total) {
-//                throw new IllegalArgumentException(" not enough desks");
-//            } else {
-//                // we can start allocating students
-//                int index = 0; // index of the desks
-//                for (int j=0; j<mylist.size(); j++){
-//                    // for each exam we have a given StudentList
-//                    for (int k=0; k<mylist.get(j).size(); k++) {
-//                        // for each student taking that given exam we create an instance of a desk with
-//                        // unique index plus his name and family name
-//                        Desk currentDesk = new Desk(index, mylist.get(j).get(k).familyName, mylist.get(j).get(k).givenNames() );
-//                        allocatedDesks.add(currentDesk);
-//                        index ++;
-//                    }
-//                }
-//                this.students = myStudentList; // list with all the students taking an exam
-//            }
-//        }
-//    }
 
     public void allocateStudents(ExamList exams, StudentList cohort) {
         if (exams.isEmpty() || cohort.isEmpty()) {
@@ -138,18 +89,15 @@ public class Session {
 
         for (Exam exam : exams.getExams()) {
             Subject subject = exam.getSubject();
-
-            // count students taking the exam (AARA + non-AARA combined)
-            int studentCount = cohort.countStudents(subject, true) + cohort.countStudents(subject, false);
-            totalStudents += studentCount;
-
             //  list of students taking this subject
-            StudentList studentsTakingExam = cohort.bySubject(subject);
+            StudentList studentsTakingExam = cohort.bySubject(subject, this.getVenue().getAARA());
             for (Student student : studentsTakingExam.getStudents()) {
-                allExamStudents.add(student); // saving all our different students no matter the exam in a StudentList
+                if (!allExamStudents.contains(student)) {
+                    allExamStudents.add(student); // saving all our different students no matter the exam in a StudentList
+                }
+
             }
             studentsByExam.add(studentsTakingExam);
-
         }
         if (allExamStudents.isEmpty()) {
             throw new IllegalStateException(" we have no students taking those exams ...");
@@ -165,43 +113,47 @@ public class Session {
 
 
         StudentList sorted = allExamStudents.sortStudents();
-        int index = 0;
-        // sorted by first name
-        // columns we are going to leave empty : ComputeGap
+        // iterating through columns ( going up to down )
+        // and then through rows ( going right to left)
+
+        int StudentCount = 0;
+        int deskCount =0;
         int freeColumns = this.ComputeGap();
-        for (int i = 0; i<this.getVenue().getColumns(); i++) {
-            // iterating through columns
-            // strating from the beginning : left
+        boolean studentsLeft = true;
+
+        for ( int i=0; i<this.getVenue().getColumns(); i++) {
+            // we also have to take into account the gaps
+
             for (int j=0; j<this.getVenue().getRows(); j++) {
-                // iterating through rows, starting from the beginning ( up )
-                this.allocatedDesks[j][i] = new Desk(index, sorted.get(index).getFamilyName(), sorted.get(index).firstName() ) ;
-                if (index < sorted.size()) {
-                    index++;
+                // iterating though the rows
+                if (studentsLeft) {
+                    this.allocatedDesks[j][i] = new Desk( deskCount, sorted.get(StudentCount).getFamilyName(), sorted.get(StudentCount).firstName());
+                    StudentCount++;
+                    deskCount++;
+                    if (StudentCount >= this.countStudents()) {
+                        studentsLeft = false;
+                    }
                 } else {
-                    // we reached the last student
-                    break;
+                    this.allocatedDesks[j][i] = new Desk(deskCount, "Empty", "");
+                    deskCount++;
                 }
+
+
             }
 
-            // here we filled up the whole j column
-            if (freeColumns > 0 && i<this.getVenue().getColumns()-1) {
-                freeColumns = freeColumns -1;
-                // for all the rows of that column we put empty desks
+            if ( freeColumns > 0 && deskCount < this.getVenue().deskCount() && i  <this.getVenue().getColumns()-1 && studentsLeft) {
+                freeColumns--;
+                // add a free column
                 for (int j=0; j<this.getVenue().getRows(); j++) {
-                    // for each row of that column number i : we assign an empty desk
-                    this.allocatedDesks[j][i] = new Desk(0, "Empty", "Empty");
+                    this.allocatedDesks[j][i+1] = new Desk(deskCount, "Empty", "");
+                    deskCount++;
                 }
-
+                // so we actually already filled a whole column so we need to increase i by one
+                i++; // skipping next column
             }
 
-            if (index < sorted.size()) {
-                continue;
-            } else {
-                break; // we have already allocated all students
-            }
 
         }
-
         this.students = allExamStudents; // Store all students taking exams
         this.studentCount = allExamStudents.size();
     }
@@ -217,6 +169,12 @@ public class Session {
 
 
     public void printDesks() {
+//        for (Student student : this.students.getStudents()) {
+//            System.out.println(student);
+//        }
+        for (Exam exam : this.exams.getExams()) {
+            System.out.println(exam);
+        }
         for (int i = 0; i < this.allocatedDesks.length; i++) {
             for (int j = 0; j < this.allocatedDesks[i].length; j++) {
                 // desk tostring
@@ -238,22 +196,16 @@ public class Session {
         return this.studentCount;
     }
 
-//    public void scheduleExam( Exam exam, int nbStudents) {
-//        // allocates an exam to this session : venue + time
-//        if (!this.exams.contains(exam)) { // if the exam is not  already in that session
-//            if (this.venue.deskCount() < nbStudents + this.countStudents()) { // and if there is enough room in the venue
-//                // too many students
-//                throw new IllegalArgumentException("too many students in our venue");
-//            } else{
-//                this.studentCount += nbStudents;
-//                this.exams.add(exam); // add given exam to the examList
-//            }
-//        }
-//    }
 
     public void scheduleExam( Exam exam, int nbStudents) {
         this.studentCount+= nbStudents;
-        this.exams.add(exam);
+        exam.setVenue(this.getVenue());
+        this.exams.add(exam); // so that exam will take place in that venue
+        //this.allocateStudents(this.exams, this.cohort);
+    }
+
+    public StudentList getCohort() {
+        return this.cohort;
     }
 
     //

@@ -64,6 +64,15 @@ public class Subject {
         return this.exams;
     }
 
+
+    public boolean equals( Subject subject) {
+        if (this.title.equals( subject.title) && this.description.equals(subject.description) && this.exams.equals(subject.getExams())) {
+            return  true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public String toString() {
         return this.title.toUpperCase(); // subject title as a String in all uppercase and a newline.

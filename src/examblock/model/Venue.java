@@ -81,6 +81,10 @@ public class Venue extends Room {
         }
     }
 
+    public boolean getAARA() {
+        return this.aara;
+    }
+
 
 
     public int deskCount() {

@@ -35,6 +35,14 @@ public class StudentList {
         }
     }
 
+    public boolean contains( Student student) {
+        if (this.students.contains(student)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Student byLui( Long lui) {
         if (this.students.isEmpty()) {
             return null;
@@ -75,12 +83,16 @@ public class StudentList {
         }
     }
 
-    public StudentList bySubject(Subject subject) {
+    public StudentList bySubject(Subject subject, boolean AARA) {
         StudentList sorted = new StudentList();
         for (int i=0; i<this.students.size(); i++) {
-            if (this.students.get(i).getSubjects().contains(subject)) {
+            //if (this.students.get(i).getSubjects().contains(subject)) {
+            if (this.students.get(i).isTakingSubject(subject)){
                 // so this student is taking that course/subject
-                sorted.add(this.students.get(i));
+                if (AARA == this.students.get(i).isAara() ) {
+                    sorted.add(this.students.get(i));
+                }
+
             }
         }
         return sorted;

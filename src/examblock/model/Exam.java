@@ -36,6 +36,8 @@ public class Exam {
     private String subtitle;
     private Character paper;
 
+    private Venue venue; // i added this
+
     public Boolean CheckConditions(int day, int month, int year, int hour, int minute) {
         if (year < 2025) {
             System.out.println("Year must be 2025 or later.");
@@ -164,6 +166,14 @@ public class Exam {
         }
 
     }
+
+    public void setVenue( Venue venue) {
+        this.venue = venue;
+    }
+
+//    public Venue getVenue() {
+//        return this.venue;
+//    }
 
 //    @Override
 //    public boolean equals(Object obj) {
