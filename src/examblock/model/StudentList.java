@@ -1,6 +1,7 @@
 package examblock.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class StudentList {
 
@@ -8,6 +9,10 @@ public class StudentList {
 
     public StudentList() {
         this.students = new ArrayList<>();
+    }
+
+    public StudentList(List<Student> students) {
+        this.students = new ArrayList<>(students);
     }
 
     public void add(Student student) {
@@ -91,6 +96,16 @@ public class StudentList {
             }
             return total;
         }
+    }
+
+    public StudentList sortStudents() {
+        // sorting students based on their frst name ( alphabetically)
+        if (this.isEmpty()) {
+            throw new IllegalStateException( " we can t sort an empty list");
+        }
+        StudentList sortedList = new StudentList(this.students);
+        sortedList.students.sort( (s1, s2) -> s1.firstName().compareTo(s2.firstName()));
+        return sortedList;
     }
 
     @Override

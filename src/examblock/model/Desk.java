@@ -33,4 +33,21 @@ public class Desk {
     public int deskNumber() {
         return this.Number;
     }
+
+    @Override
+    public String toString() {
+
+        if ( this.FamilyName != null && this.GivenName != null) {
+            return "Desk{" +
+                    "FamilyName='" + FamilyName + '\'' +
+                    ", GivenName='" + GivenName + '\'' +
+                    ", Number=" + Number +
+                    '}';
+        } else {
+            return "Desk{" +
+                    ", Number=" + Number +
+                    '}';
+        }
+
+    }
 }

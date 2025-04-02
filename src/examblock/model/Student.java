@@ -106,7 +106,8 @@ public class Student {
     }
 
     public String firstName() {
-        return this.firstName();
+        String first = this.givenNames.split(" ")[0];
+        return first;
     }
 
     public String getFamilyName() {
@@ -130,13 +131,13 @@ public class Student {
         }
             }
 
-    public void setFamily( String familyName) {
-        this.familyName = familyName;
-    }
-
-    public void setGiven(String givenNames) {
-        this.givenNames = givenNames;
-    }
+//    public void setFamily( String familyName) {
+//        this.familyName = familyName;
+//    }
+//
+//    public void setGiven(String givenNames) {
+//        this.givenNames = givenNames;
+//    }
 
     public String shortName() {
         String first = this.givenNames.split(" ")[0];

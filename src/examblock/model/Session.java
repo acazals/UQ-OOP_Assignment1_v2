@@ -13,7 +13,8 @@ public class Session {
     private ExamList exams;
     private StudentList students;
     private StudentList cohort;
-    private ArrayList<Desk> allocatedDesks;
+    //private ArrayList<Desk> allocatedDesks;
+    private Desk[][] allocatedDesks;
     private int studentCount;
 
     public Session (Venue venue, int sessionNumber, LocalDate day, LocalTime start) {
@@ -41,7 +42,7 @@ public class Session {
         this.start = start;
         this.exams = new ExamList();
         this.students = new StudentList();
-        this.allocatedDesks = new ArrayList<>();
+        this.allocatedDesks = new Desk[venue.getRows()][venue.getColumns()];
     }
 
     public ExamList getExams(){
@@ -144,8 +145,14 @@ public class Session {
 
             //  list of students taking this subject
             StudentList studentsTakingExam = cohort.bySubject(subject);
+            for (Student student : studentsTakingExam.getStudents()) {
+                allExamStudents.add(student); // saving all our different students no matter the exam in a StudentList
+            }
             studentsByExam.add(studentsTakingExam);
 
+        }
+        if (allExamStudents.isEmpty()) {
+            throw new IllegalStateException(" we have no students taking those exams ...");
         }
 
 //        if (this.venue == null || this.venue.deskCount() < totalStudents) {
@@ -153,15 +160,46 @@ public class Session {
 //        }
 
         // 2 :  Allocate desks
-        int deskIndex = 0;
-        for (StudentList students : studentsByExam) {
-            // for each student list, sorted by exam
-            for (Student student : students.getStudents()) {
-                // sort students alphabetically
-                Desk desk = new Desk(deskIndex++, student.getFamilyName(), student.givenNames());
-                allocatedDesks.add(desk); // use a matrix instead
-                allExamStudents.add(student);
+        // seated in alphabetical order by surname starting from the desk in the front left corner
+        // so firstname ( we have a getter for that)
+
+
+        StudentList sorted = allExamStudents.sortStudents();
+        int index = 0;
+        // sorted by first name
+        // columns we are going to leave empty : ComputeGap
+        int freeColumns = this.ComputeGap();
+        for (int i = 0; i<this.getVenue().getColumns(); i++) {
+            // iterating through columns
+            // strating from the beginning : left
+            for (int j=0; j<this.getVenue().getRows(); j++) {
+                // iterating through rows, starting from the beginning ( up )
+                this.allocatedDesks[j][i] = new Desk(index, sorted.get(index).getFamilyName(), sorted.get(index).firstName() ) ;
+                if (index < sorted.size()) {
+                    index++;
+                } else {
+                    // we reached the last student
+                    break;
+                }
             }
+
+            // here we filled up the whole j column
+            if (freeColumns > 0 && i<this.getVenue().getColumns()-1) {
+                freeColumns = freeColumns -1;
+                // for all the rows of that column we put empty desks
+                for (int j=0; j<this.getVenue().getRows(); j++) {
+                    // for each row of that column number i : we assign an empty desk
+                    this.allocatedDesks[j][i] = new Desk(0, "Empty", "Empty");
+                }
+
+            }
+
+            if (index < sorted.size()) {
+                continue;
+            } else {
+                break; // we have already allocated all students
+            }
+
         }
 
         this.students = allExamStudents; // Store all students taking exams
@@ -179,10 +217,21 @@ public class Session {
 
 
     public void printDesks() {
-        // print layouts of the desks
-        for (int i=0; i<this.allocatedDesks.size(); i++) {
-            System.out.println( allocatedDesks.get(i).toString() );
+        for (int i = 0; i < this.allocatedDesks.length; i++) {
+            for (int j = 0; j < this.allocatedDesks[i].length; j++) {
+                // desk tostring
+                System.out.print(this.allocatedDesks[i][j] + "\t");
+            }
+            System.out.println();
         }
+    }
+
+    public int ComputeGap() {
+        // using total desks + number of students
+        return ((this.getVenue().deskCount() - this.countStudents()) / this.getVenue().getRows());
+        // get rows = nb of desk per column
+        // if we have more then a whole column free we can afford a free column for the gap
+        // so we compute how many free columns we can afford : we count number of free seats and count how many free columns that is
     }
 
     public int countStudents() {
