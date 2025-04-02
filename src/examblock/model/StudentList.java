@@ -116,7 +116,7 @@ public class StudentList {
             throw new IllegalStateException( " we can t sort an empty list");
         }
         StudentList sortedList = new StudentList(this.students);
-        sortedList.students.sort( (s1, s2) -> s1.firstName().compareTo(s2.firstName()));
+        sortedList.students.sort( (s1, s2) -> s1.familyName.compareTo(s2.familyName));
         return sortedList;
     }
 

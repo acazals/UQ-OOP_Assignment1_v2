@@ -175,13 +175,46 @@ public class Session {
         for (Exam exam : this.exams.getExams()) {
             System.out.println(exam);
         }
-        for (int i = 0; i < this.allocatedDesks.length; i++) {
-            for (int j = 0; j < this.allocatedDesks[i].length; j++) {
-                // desk tostring
-                System.out.print(this.allocatedDesks[i][j] + "\t");
+
+        int rows = this.allocatedDesks.length;
+        int cols = this.allocatedDesks[0].length;
+
+        for (int i = 0; i < rows; i++) {  // Iterate over rows
+            for (int line = 0; line < 3; line++) { // 3 lines per desk
+                for (int j = 0; j < cols; j++) {  // Iterate throu columns
+                    Desk desk = this.allocatedDesks[i][j];
+
+                    if (desk == null || desk.deskFamilyName().equals("Empty")) {
+                        switch (line) {
+                            case 0:
+                                System.out.printf("Desk %-10d", (i * cols + j)); //  desk number
+                                break;
+                            case 1:
+                                System.out.printf("%-15s", "Empty"); // empty
+                                break;
+                            case 2:
+                                System.out.printf("%-15s", " "); // no given name
+                                break;
+                        }
+                    } else {
+                        switch (line) {
+                            case 0: // Desk Number
+                                System.out.printf("Desk %-10d", desk.deskNumber());
+                                break;
+                            case 1: //  Family Name
+                                System.out.printf("%-15s", desk.deskFamilyName());
+                                break;
+                            case 2: // given Name
+                                System.out.printf("%-15s", desk.deskGivenAndInit());
+                                break;
+                        }
+                    }
+                }
+                System.out.println(); //  line after each row
             }
-            System.out.println();
+            System.out.println(); // separating matrix rows
         }
+
     }
 
     public int ComputeGap() {

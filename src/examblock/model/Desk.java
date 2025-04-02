@@ -34,20 +34,32 @@ public class Desk {
         return this.Number;
     }
 
+//    @Override
+//    public String toString() {
+//
+//        if ( this.FamilyName != null && this.GivenName != null) {
+//            return "Desk{" +
+//                    "FamilyName='" + FamilyName + '\'' +
+//                    ", GivenName='" + GivenName + '\'' +
+//                    ", Number=" + Number +
+//                    '}';
+//        } else {
+//            return "Desk{" +
+//                    ", Number=" + Number +
+//                    '}';
+//        }
+//
+//    }
+
     @Override
     public String toString() {
+//        if (this.FamilyName.equals("Empty")) {
+//            return " ";
+//        }
+//        return String.format("%s%n%s", this.FamilyName, this.GivenName);
 
-        if ( this.FamilyName != null && this.GivenName != null) {
-            return "Desk{" +
-                    "FamilyName='" + FamilyName + '\'' +
-                    ", GivenName='" + GivenName + '\'' +
-                    ", Number=" + Number +
-                    '}';
-        } else {
-            return "Desk{" +
-                    ", Number=" + Number +
-                    '}';
-        }
-
+        StringBuilder sb = new StringBuilder();
+        sb.append(" Desk : " + this.Number).append("\n" + this.FamilyName).append("\n" + this.GivenName);
+        return  sb.toString();
     }
 }
