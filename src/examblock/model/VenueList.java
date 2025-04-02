@@ -22,10 +22,16 @@ public class VenueList {
             // the given list : sessions.forVenue(venue);
             for (Session session : sessions.forVenue(venue)) {
                 // for each session taking place in that venue
-
+                ExamList corresponding = new ExamList();
                 for (Exam exam : exams.getExams()) {
-                    session.allocateStudents(exams, cohort); // examlist always the same
+                    if (exam.getVenue() != null){
+                        if (exam.getVenue().equals(venue)){
+                            corresponding.add(exam);
+                        }
+                    }
+
                 }
+                session.allocateStudents(corresponding, cohort); // examlist always the same
 
 
             }

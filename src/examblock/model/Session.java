@@ -169,9 +169,9 @@ public class Session {
 
 
     public void printDesks() {
-//        for (Student student : this.students.getStudents()) {
-//            System.out.println(student);
-//        }
+        for (Student student : this.students.getStudents()) {
+            System.out.println(student);
+        }
         for (Exam exam : this.exams.getExams()) {
             System.out.println(exam);
         }

@@ -171,9 +171,9 @@ public class Exam {
         this.venue = venue;
     }
 
-//    public Venue getVenue() {
-//        return this.venue;
-//    }
+    public Venue getVenue() {
+        return this.venue;
+    }
 
 //    @Override
 //    public boolean equals(Object obj) {
